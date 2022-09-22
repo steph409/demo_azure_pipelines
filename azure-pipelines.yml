@@ -7,7 +7,7 @@ trigger:
 - master
 
 pool:
-  name: 'MyAgentPool'
+  name: 'vmscalesetpool'
 strategy:
   matrix:
     Python27:
