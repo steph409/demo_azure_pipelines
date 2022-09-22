@@ -7,7 +7,7 @@ trigger:
 - master
 
 pool:
-  vmImage: 'MyAgentPool'
+  name: 'MyAgentPool'
 strategy:
   matrix:
     Python27:
