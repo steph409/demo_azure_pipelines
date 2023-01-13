@@ -23,13 +23,13 @@ steps:
   - task: AzureCLI@2
     displayName: "Copy Install Script"
     inputs:
-      azureSubscription: 'ImageBuilder'
+      azureSubscription: '<SubscriptionName>'
       scriptType: 'bash'
       scriptLocation: 'inlineScript'
       inlineScript: |
         az storage blob upload \
-                  --account-name <StorageAccountName> \
-                  --container-name <ContainerName> \
+                  --account-name vmimagebuilder \
+                  --container-name images \
                   --name Install-Applications.ps1 \
                   --file Install-Applications.ps1 \
   - task: AzureResourceManagerTemplateDeployment@3
@@ -37,7 +37,7 @@ steps:
     continueOnError: true
     inputs:
       deploymentScope: 'Resource Group'
-      azureResourceManagerConnection: 'ImageBuilder'
+      azureResourceManagerConnection: 'vm-builder-service-connection'
       subscriptionId: '<SubscriptionID>'
       action: 'Create Or Update Resource Group'
       resourceGroupName: '$(ResourceGroup)'
