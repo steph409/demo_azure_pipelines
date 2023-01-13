@@ -13,11 +13,11 @@ pool:
 
 variables:
 - name: Location
-  value: '<Location>'
+  value: 'East US'
 - name: ResourceGroup
-  value: '<ResourceGroup'
+  value: 'demo-vm-image-builder'
 - name: ImageTemplateName
-  value: '<TemplateName>
+  value: 'Win10MultiTemplate'
 
 steps:
   - task: AzureCLI@2
