@@ -1,36 +1,69 @@
-# Python package
-# Create and test a Python package on multiple Python versions.
-# Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/python
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
 
-trigger:
-- master
+# trigger:
+# - master
+trigger: none
+pr: none
 
 pool:
-  name: 'vmscalesetpool'
-strategy:
-  matrix:
-    Python27:
-      python.version: '2.7'
-    Python35:
-      python.version: '3.5'
-    Python36:
-      python.version: '3.6'
-    Python37:
-      python.version: '3.7'
+  vmImage: ubuntu-latest
+
+variables:
+- name: Location
+  value: '<Location>'
+- name: ResourceGroup
+  value: '<ResourceGroup'
+- name: ImageTemplateName
+  value: '<TemplateName>
 
 steps:
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '$(python.version)'
-  displayName: 'Use Python $(python.version)'
-
-- script: |
-    python -m pip install --upgrade pip
-    pip install -r requirements.txt
-  displayName: 'Install dependencies'
-
-- script: |
-    pip install pytest pytest-azurepipelines
-    pytest
-  displayName: 'pytest'
+  - task: AzureCLI@2
+    displayName: "Copy Install Script"
+    inputs:
+      azureSubscription: 'ImageBuilder'
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        az storage blob upload \
+                  --account-name <StorageAccountName> \
+                  --container-name <ContainerName> \
+                  --name Install-Applications.ps1 \
+                  --file Install-Applications.ps1 \
+  - task: AzureResourceManagerTemplateDeployment@3
+    displayName: "Deploy Template"
+    continueOnError: true
+    inputs:
+      deploymentScope: 'Resource Group'
+      azureResourceManagerConnection: 'ImageBuilder'
+      subscriptionId: '<SubscriptionID>'
+      action: 'Create Or Update Resource Group'
+      resourceGroupName: '$(ResourceGroup)'
+      location: '$(Location)'
+      templateLocation: 'Linked artifact'
+      csmFile: 'Win10MultiTemplate.json'
+      csmParametersFile: 'Win10MultiTemplate.parameters.json'
+      deploymentMode: 'Incremental'
+  - task: AzurePowerShell@5
+    displayName: "Install Az.ImageBuilder"
+    inputs:
+      azureSubscription: 'ImageBuilder'
+      ScriptType: 'InlineScript'
+      Inline: 'Install-Module -name Az.ImageBuilder -AllowPrerelease -Force -Scope CurrentUser'
+      azurePowerShellVersion: 'LatestVersion'
+  - task: AzurePowerShell@5
+    displayName: "Build Image"
+    inputs:
+      azureSubscription: 'ImageBuilder'
+      ScriptType: 'InlineScript'
+      Inline: 'Start-AzImageBuilderTemplate -ResourceGroupName $(ResourceGroup) -Name $(ImageTemplateName)'
+      azurePowerShellVersion: 'LatestVersion'
+  - task: AzurePowerShell@5
+    displayName: "Remove Template"
+    inputs:
+      azureSubscription: 'ImageBuilder'
+      ScriptType: 'InlineScript'
+      Inline: 'Remove-AzImageBuilderTemplate -ImageTemplateName $(ImageTemplateName) -ResourceGroupName $(ResourceGroup)'
+      azurePowerShellVersion: 'LatestVersion'
