@@ -3,13 +3,13 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "imageTemplateName": {
-            "value": "<ImageTemplateName>"
+            "value": "Win10MultiTemplate"
         },
         "api-version": {
             "value": "2019-05-01-preview"
         },
         "svclocation": {
-            "value": "<Location>"
+            "value": "EastUS2"
         }
     }
 }
