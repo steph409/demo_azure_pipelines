@@ -18,12 +18,14 @@ variables:
   value: 'demo-vm-image-builder'
 - name: ImageTemplateName
   value: 'Win10MultiTemplate'
+- name: SubscriptionName
+  value: 'MCAPS-Hybrid-REQ-39685-2022-stephanielanius'
 
 steps:
   - task: AzureCLI@2
     displayName: "Copy Install Script"
     inputs:
-      azureSubscription: '<SubscriptionName>'
+      azureSubscription: '$(SubscriptionName)'
       scriptType: 'bash'
       scriptLocation: 'inlineScript'
       inlineScript: |
@@ -49,21 +51,21 @@ steps:
   - task: AzurePowerShell@5
     displayName: "Install Az.ImageBuilder"
     inputs:
-      azureSubscription: 'ImageBuilder'
+      azureSubscription: '$(SubscriptionName)'
       ScriptType: 'InlineScript'
       Inline: 'Install-Module -name Az.ImageBuilder -AllowPrerelease -Force -Scope CurrentUser'
       azurePowerShellVersion: 'LatestVersion'
   - task: AzurePowerShell@5
     displayName: "Build Image"
     inputs:
-      azureSubscription: 'ImageBuilder'
+      azureSubscription: '$(SubscriptionName)'
       ScriptType: 'InlineScript'
       Inline: 'Start-AzImageBuilderTemplate -ResourceGroupName $(ResourceGroup) -Name $(ImageTemplateName)'
       azurePowerShellVersion: 'LatestVersion'
   - task: AzurePowerShell@5
     displayName: "Remove Template"
     inputs:
-      azureSubscription: 'ImageBuilder'
+      azureSubscription: '$(SubscriptionName)'
       ScriptType: 'InlineScript'
       Inline: 'Remove-AzImageBuilderTemplate -ImageTemplateName $(ImageTemplateName) -ResourceGroupName $(ResourceGroup)'
       azurePowerShellVersion: 'LatestVersion'
