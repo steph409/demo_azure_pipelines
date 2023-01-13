@@ -39,7 +39,7 @@ steps:
     inputs:
       deploymentScope: 'Resource Group'
       azureResourceManagerConnection: 'vm-builder-service-connection'
-      subscriptionId: '<SubscriptionID>'
+      subscriptionId: '83ac2936-c7ed-4f74-a1c8-7575b04ce7be'
       action: 'Create Or Update Resource Group'
       resourceGroupName: '$(ResourceGroup)'
       location: '$(Location)'
